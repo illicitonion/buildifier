@@ -311,6 +311,9 @@ func IndexOfRuleByName(f *build.File, name string) (int, *build.Rule) {
 		if r.Name() == name || start.Line == linenum {
 			return i, r
 		}
+		if baseName := r.AttrString("base_name"); baseName != "" && strings.HasPrefix(name, baseName) {
+			return i, r
+		}
 	}
 	return -1, nil
 }
