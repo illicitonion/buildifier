@@ -192,11 +192,16 @@ func (r *Rule) ExplicitName() string {
 // Name returns the rule's target name.
 // If the rule has no explicit target name, Name returns the implicit name if there is one, else the empty string.
 func (r *Rule) Name() string {
-	explicitName := r.ExplicitName()
-	if explicitName == "" && r.Kind() != "package" {
+	if explicitName := r.ExplicitName() ; explicitName != "" {
+		return explicitName
+	}
+	if baseName := r.AttrString("base_name"); baseName != "" {
+		return baseName
+	}
+	if r.Kind() != "package" {
 		return r.ImplicitName
 	}
-	return explicitName
+	return ""
 }
 
 // AttrKeys returns the keys of all the rule's attributes.
