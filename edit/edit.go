@@ -301,6 +301,10 @@ func IndexOfRuleByName(f *build.File, name string) (int, *build.Rule) {
 		}
 	}
 
+	found_by_basename_line := -1
+	var found_by_basename_rule *build.Rule
+	found_by_basename_count := 0
+
 	for i, stmt := range f.Stmt {
 		call, ok := stmt.(*build.CallExpr)
 		if !ok {
@@ -312,10 +316,15 @@ func IndexOfRuleByName(f *build.File, name string) (int, *build.Rule) {
 			return i, r
 		}
 		if baseName := r.AttrString("base_name"); baseName != "" && strings.HasPrefix(name, baseName) {
-			return i, r
+			found_by_basename_line = i
+			found_by_basename_rule = r
+			found_by_basename_count += 1
 		}
 	}
-	return -1, nil
+	if found_by_basename_count > 1 {
+		return -1, nil
+	}
+	return found_by_basename_line, found_by_basename_rule
 }
 
 // FindExportedFile returns the first exports_files call which contains the
